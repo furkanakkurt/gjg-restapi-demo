@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo "Test"
+                echo "Test, but modified"
             }
         }
         stage('Integration Test') {
