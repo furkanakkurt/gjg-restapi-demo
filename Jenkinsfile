@@ -12,26 +12,41 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
                 sh "mvn --version"
                 sh "docker --version"
-
                 echo "Build"
                 echo "$PATH"
                 echo "Build number - $env.BUILD_NUMBER"
                 echo "Build tag - $env.BUILD_TAG"
-                echo "Build url - $env.BUILD_URL"
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "mvn clean install"
             }
         }
         stage('Test') {
             steps {
-                echo "Test, but modified"
+                sh "mvn test"
             }
         }
-        stage('Integration Test') {
+        stage('Build Docker Image') {
             steps {
-                echo "Integration Test"
+                script {
+                    dockerImage = docker.build("meakkurt/gjg-restapi-demo:${env.BUILD_TAG}")
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', 'dockerhub') {
+                        dockerImage.push();
+                        dockerImage.push('latest');
+                    }
+                }
             }
         }
     }
