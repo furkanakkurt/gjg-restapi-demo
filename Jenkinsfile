@@ -27,15 +27,15 @@ pipeline {
                 sh "mvn clean install"
             }
         }
-        stage('Test') {
-            steps {
-                sh "mvn test"
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         sh "mvn test"
+        //     }
+        // }
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("meakkurt/gjg-restapi-demo:${env.BUILD_TAG}")
+                    dockerImage = docker.build("meakkurt/gjg-restapi-demo")
                 }
             }
         }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub') {
-                        dockerImage.push();
+                        dockerImage.push("$env.BUILD_TAG");
                         dockerImage.push('latest');
                     }
                 }
