@@ -29,9 +29,11 @@ pipeline {
         // }
         stage('Create File') {
             steps {
-                pom = readMavenPom file: 'pom.xml'
-                currentVersion = pom.version
-                sh "echo ${currentVersion} > version.txt"
+                script {
+                    pom = readMavenPom file: 'pom.xml'
+                    currentVersion = pom.version
+                    sh "echo ${currentVersion} > version.txt"
+                }
             }
         }
 
