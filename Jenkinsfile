@@ -22,33 +22,36 @@ pipeline {
                 echo "Build tag - $env.BUILD_TAG"
             }
         }
-        stage('Build') {
-            steps {
-                sh "mvn clean install"
-            }
-        }
-        // stage('Test') {
+        // stage('Build') {
         //     steps {
-        //         sh "mvn test"
+        //         sh "mvn clean install"
         //     }
         // }
-        stage('Build Docker Image') {
+        stage('Create File') {
             steps {
-                script {
-                    dockerImage = docker.build("meakkurt/gjg-restapi-demo")
-                }
+                pom = readMavenPom file: 'pom.xml'
+                currentVersion = pom.version
+                sh "echo ${currentVersion} > version.txt"
             }
         }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'dockerhub') {
-                        dockerImage.push("$env.BUILD_TAG");
-                        dockerImage.push('latest');
-                    }
-                }
-            }
-        }
+
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             dockerImage = docker.build("meakkurt/gjg-restapi-demo")
+        //         }
+        //     }
+        // }
+        // stage('Push Docker Image') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry('', 'dockerhub') {
+        //                 dockerImage.push("$env.BUILD_TAG");
+        //                 dockerImage.push('latest');
+        //             }
+        //         }
+        //     }
+        // }
     }
     // Good when you want to clean up and etc
     // post {
