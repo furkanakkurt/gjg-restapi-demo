@@ -47,7 +47,7 @@ pipeline {
                     // Change something in the file
                     data.version = currentVersion
 
-                    sh "rm $filename"
+                    sh "sudo rm $filename"
                     writeYaml file: filename, data: data
                 }
             }
