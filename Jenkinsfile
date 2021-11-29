@@ -46,21 +46,22 @@ pipeline {
                     previousTag = tagdata.tag
 
                     // compare current and previous version
-                    sh """if [[ "$previousVersion" == "$currentVersion" ]] \
+                    sh """
+                    if [[ "\$previousVersion" == "\$currentVersion" ]] \
                     then \
-                        oldTagLastDigit = ${previousTag:5:1} \
+                        oldTagLastDigit = \${previousTag:5:1} \
                         echo "$oldTagLastDigit" \
-                        deleted = ${previousTag::-1} \
+                        deleted = \${previousTag::-1} \
                         echo "$deleted" \
-                        currentTag = "${deleted}.${oldLastDigit+1}"  \
-                        echo "$currentTag" \
+                        currentTag = "\${deleted}.\${oldLastDigit+1}"  \
+                        echo "\$currentTag" \
                     else \
-                        oldTagFirstDigit = ${previousTag:1:1} \
-                        echo "$oldTagFirstDigit" \
-                        deleted = ${previousTag::-3} \
-                        echo "$deleted" \
-                        currentTag = "${oldTagFirstDigit+1}.0.1" \
-                        echo "$currentTag" \
+                        oldTagFirstDigit = \${previousTag:1:1} \
+                        echo "\$oldTagFirstDigit" \
+                        deleted = \${previousTag::-3} \
+                        echo "\$deleted" \
+                        currentTag = "\${oldTagFirstDigit+1}.0.1" \
+                        echo "\$currentTag" \
                     fi \ 
                     """
 
