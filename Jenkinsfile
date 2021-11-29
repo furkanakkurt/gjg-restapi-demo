@@ -40,7 +40,7 @@ pipeline {
         stage('Edit File') {
             steps {
                 script {
-                    def filename = '/var/lib/version.yaml'
+                    def filename = 'version.yaml'
                     def data = readYaml file: filename
                     echo "Echo data"
                     echo "$data.version"
