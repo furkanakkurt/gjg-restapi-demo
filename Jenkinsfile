@@ -42,13 +42,12 @@ pipeline {
                 script {
                     def filename = 'version.yaml'
                     def data = readYaml file: filename
-                    echo "Echo data"
-                    echo "$data.version"
+
                     // Change something in the file
                     data.version = currentVersion
-                    sh "pwd"
-                    // sh "rm $filename"
-                    // writeYaml file: filename, data: data
+                
+                    sh "rm $filename"
+                    writeYaml file: filename, data: data
                 }
             }
         }
