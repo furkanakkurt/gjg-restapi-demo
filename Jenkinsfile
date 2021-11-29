@@ -70,6 +70,9 @@ pipeline {
                     tagdata.tag = currentTag
                     sh "rm $filetag"
                     writeYaml file: filetag, data: tagdata
+
+                    // set env variable to use in next script tag
+                    env.TAG = currentVersion
                 }
             }
         }
@@ -82,7 +85,7 @@ pipeline {
                         'https://461902953491.dkr.ecr.eu-west-1.amazonaws.com',
                         'ecr:eu-west-1:aws-ecr') {
                             def image = docker.build('gjg-restapi-demo')
-                            image.push(currentTag)
+                            image.push(env.TAG)
                     }   
                 }
             }
