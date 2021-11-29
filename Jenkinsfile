@@ -62,6 +62,8 @@ pipeline {
                         // echo "$currentTag"
                     }
                     
+                    echo "Current tag $currentTag"
+
                     // Change old version and tag
                     data.version = currentVersion
                     sh "rm $filename"
