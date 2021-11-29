@@ -49,12 +49,17 @@ pipeline {
                     def currentTag = previousTag
                     if (previousVersion == currentVersion) {
                         final oldTagLastDigit = previousTag.substring(previousTag.length()-1) as int
+                        echo "$oldTagLastDigit"
                         final deleted = previousTag.substring(0, previousTag.length()-1)
+                        echo "$deleted"
                         currentTag = deleted + (++oldTagLastDigit)
+                        echo "$currentTag"
                     }
                     else {
                         final oldTagFirstDigit = previousTag.substring(0, 1) as int
+                        echo "$oldTagFirstDigit"
                         currentTag = "" + (++oldTagFirstDigit) + ".0.1"
+                        echo "$currentTag"
                     }
                     
                     // sh 
