@@ -37,6 +37,22 @@ pipeline {
             }
         }
 
+        stage('Edit File') {
+            steps {
+                script {
+                    def filename = '/var/lib/version.yaml'
+                    def data = readYaml file: filename
+                    echo "Echo data"
+                    echo "$data.version"
+                    // Change something in the file
+                    data.version = currentVersion
+
+                    sh "rm $filename"
+                    writeYaml file: filename, data: data
+                }
+            }
+        }
+
         // stage('Build Docker Image') {
         //     steps {
         //         script {
