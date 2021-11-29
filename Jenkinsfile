@@ -83,8 +83,7 @@ pipeline {
                         'ecr:eu-west-1:aws-ecr') {
                             def image = docker.build('gjg-restapi-demo')
                             image.push(currentTag)
-                        }
-                    )
+                    }   
                 }
             }
         }
