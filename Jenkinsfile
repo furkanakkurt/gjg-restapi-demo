@@ -46,9 +46,9 @@ pipeline {
                     echo "$data.version"
                     // Change something in the file
                     data.version = currentVersion
-
-                    sh "sudo rm $filename"
-                    writeYaml file: filename, data: data
+                    sh "pwd"
+                    // sh "rm $filename"
+                    // writeYaml file: filename, data: data
                 }
             }
         }
