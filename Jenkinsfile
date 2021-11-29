@@ -28,7 +28,7 @@ pipeline {
         //     }
         // }
 
-        stage('Edit File') {
+        stage('Update Version and Tag') {
             steps {
                 script {
                     // read current version 
@@ -49,38 +49,19 @@ pipeline {
                     def currentTag = previousTag
                     if (previousVersion == currentVersion) {
                         final oldTagLastDigit = previousTag.substring(previousTag.length()-1) as int
-                        echo "$oldTagLastDigit"
+                        // echo "$oldTagLastDigit"
                         final deleted = previousTag.substring(0, previousTag.length()-1)
-                        echo "$deleted"
+                        // echo "$deleted"
                         currentTag = deleted + (++oldTagLastDigit)
-                        echo "$currentTag"
+                        // echo "$currentTag"
                     }
                     else {
                         final oldTagFirstDigit = previousTag.substring(0, 1) as int
-                        echo "$oldTagFirstDigit"
+                        // echo "$oldTagFirstDigit"
                         currentTag = "" + (++oldTagFirstDigit) + ".0.1"
-                        echo "$currentTag"
+                        // echo "$currentTag"
                     }
                     
-                    // sh 
-                    // if [[ "$previousVersion" == "$currentVersion" ]] 
-                    // then 
-                    //     oldTagLastDigit = ${previousTag:5:1} 
-                    //     echo "$oldTagLastDigit" 
-                    //     deleted = ${previousTag::-1} 
-                    //     echo "$deleted" 
-                    //     currentTag = "${deleted}.${oldLastDigit+1}"  
-                    //     echo "$currentTag" 
-                    // else 
-                    //     oldTagFirstDigit = ${previousTag:1:1} 
-                    //     echo "$oldTagFirstDigit" 
-                    //     deleted = ${previousTag::-3} 
-                    //     echo "$deleted" 
-                    //     currentTag = "${oldTagFirstDigit+1}.0.1" 
-                    //     echo "$currentTag" 
-                    // fi 
-                    
-
                     // Change old version and tag
                     data.version = currentVersion
                     sh "rm $filename"
@@ -93,13 +74,20 @@ pipeline {
             }
         }
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         script {
-        //             dockerImage = docker.build("meakkurt/gjg-restapi-demo")
-        //         }
-        //     }
-        // }
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    // dockerImage = docker.build("meakkurt/gjg-restapi-demo")
+                    docker.withRegistry(
+                        'https://461902953491.dkr.ecr.eu-west-1.amazonaws.com',
+                        'ecr:eu-west-1:aws-ecr') {
+                            def image = docker.build('gjg-restapi-demo')
+                            image.push(currentTag)
+                        }
+                    )
+                }
+            }
+        }
         // stage('Push Docker Image') {
         //     steps {
         //         script {
