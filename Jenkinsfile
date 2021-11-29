@@ -46,24 +46,35 @@ pipeline {
                     previousTag = tagdata.tag
 
                     // compare current and previous version
-                    sh '''
-                    if [[ "$previousVersion" == "$currentVersion" ]] 
-                    then 
-                        oldTagLastDigit = ${previousTag:5:1} 
-                        echo "$oldTagLastDigit" 
-                        deleted = ${previousTag::-1} 
-                        echo "$deleted" 
-                        currentTag = "${deleted}.${oldLastDigit+1}"  
-                        echo "$currentTag" 
-                    else 
-                        oldTagFirstDigit = ${previousTag:1:1} 
-                        echo "$oldTagFirstDigit" 
-                        deleted = ${previousTag::-3} 
-                        echo "$deleted" 
-                        currentTag = "${oldTagFirstDigit+1}.0.1" 
-                        echo "$currentTag" 
-                    fi 
-                    '''
+                    def currentTag = previousTag
+                    if (previousVersion == currentVersion) {
+                        final oldTagLastDigit = previousTag.substring(previousTag.length()-1) as int
+                        final deleted = previousTag.substring(0, previousTag.length()-1)
+                        currentTag = deleted + (++oldTagLastDigit)
+                    }
+                    else {
+                        final oldTagFirstDigit = previousTag.substring(0, 1) as int
+                        currentTag = "" + (++oldTagFirstDigit) + ".0.1"
+                    }
+                    
+                    // sh 
+                    // if [[ "$previousVersion" == "$currentVersion" ]] 
+                    // then 
+                    //     oldTagLastDigit = ${previousTag:5:1} 
+                    //     echo "$oldTagLastDigit" 
+                    //     deleted = ${previousTag::-1} 
+                    //     echo "$deleted" 
+                    //     currentTag = "${deleted}.${oldLastDigit+1}"  
+                    //     echo "$currentTag" 
+                    // else 
+                    //     oldTagFirstDigit = ${previousTag:1:1} 
+                    //     echo "$oldTagFirstDigit" 
+                    //     deleted = ${previousTag::-3} 
+                    //     echo "$deleted" 
+                    //     currentTag = "${oldTagFirstDigit+1}.0.1" 
+                    //     echo "$currentTag" 
+                    // fi 
+                    
 
                     // Change old version and tag
                     data.version = currentVersion
