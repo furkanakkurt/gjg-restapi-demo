@@ -111,15 +111,14 @@ pipeline {
         // }
     }
     // Good when you want to clean up and etc
-    // post {
-    //     always {
-    //         echo "Runs always"
-    //     }
-    //     success {
-    //         echo "Runs when successful"
-    //     }
-    //     failure {
-    //         echo "Runs when fail"
-    //     }
-    // }
+    post {
+        always {
+            echo "Build finished"
+        }
+        failure {
+            mail to: 'furkan.akkurt@commencis.com',
+            subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+            body: "Something is wrong with ${env.BUILD_URL}"
+        }
+    }
 }
