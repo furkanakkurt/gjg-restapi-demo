@@ -22,11 +22,19 @@ pipeline {
                 echo "Build tag - $env.BUILD_TAG"
             }
         }
-        // stage('Build') {
-        //     steps {
-        //         sh "mvn clean install"
-        //     }
-        // }
+        stage ('AWS Login'){
+            steps {
+                sh '''
+                 export AWS_PROFILE=default
+                 /usr/local/bin/aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+                '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "mvn clean install"
+            }
+        }
         /*
         stage('Update Version and Tag') {
             steps {
