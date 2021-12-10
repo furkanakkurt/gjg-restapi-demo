@@ -27,7 +27,7 @@ pipeline {
         //         sh "mvn clean install"
         //     }
         // }
-
+        /*
         stage('Update Version and Tag') {
             steps {
                 script {
@@ -90,6 +90,7 @@ pipeline {
                 }
             }
         }
+        */
         // stage('Push Docker Image') {
         //     steps {
         //         script {
