@@ -24,9 +24,12 @@ pipeline {
         }
         stage ('AWS Login'){
             steps {
+                //  export AWS_PROFILE=default // this line is the first line of sh
                 sh '''
-                 export AWS_PROFILE=default
-                 /usr/local/bin/aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+                aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+                docker build -t sample-image .
+                docker tag sample-image:1.0.0.0 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
+                docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
                 '''
             }
         }
