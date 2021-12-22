@@ -23,90 +23,105 @@ pipeline {
                 echo "Build tag - $env.BUILD_TAG"
             }
         }
-        stage ('AWS Login'){
+        // stage('Build') {
+        //     steps {
+        //         sh "mvn clean install"
+        //     }
+        // }
+        stage('Image Build and Push') {
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    //  export AWS_PROFILE=default // this line is the first line of sh
                     sh '''
-                    mvn clean install
-                    aws --version
-                    aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
-                    docker build -t gjg-restapi:latest .
-                    docker tag gjg-restapi:latest 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
-                    docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
+                    ##### INTERNAL DOCKER IMAGE BUILD & PUSH #############
+                    echo "INTERNAL DOCKER IMAGE BUILD & PUSH"
+                    POM_LOCAL_VERSION=$(yq -r gjg_restapi_backend_dev_version.yaml .version )
+                    
+                    echo $POM_LOCAL_VERSION
+                    
                     '''
+                    // RELEASE_VERSION=$(yq -r .xxx.digit  gjg_restapi_backend_dev_version.yaml)
+                    // echo $RELEASE_VERSION
                 }
             }
         }
-        stage('Build') {
-            steps {
-                sh "mvn clean install"
-            }
-        }
-        /*
-        stage('Update Version and Tag') {
-            steps {
-                script {
-                    // read current version 
-                    pom = readMavenPom file: 'pom.xml'
-                    currentVersion = pom.version
+        // stage ('AWS Build and Push Image'){
+        //     steps {
+        //         withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //             //  export AWS_PROFILE=default // this line is the first line of sh
+        //             sh '''
+        //             aws --version
+        //             aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+        //             docker build -t gjg-restapi:latest .
+        //             docker tag gjg-restapi:latest 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
+        //             docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
+        //             '''
+        //         }
+        //     }
+        // }
+        // stage('Update Version and Tag') {
+        //     steps {
+        //         script {
+        //             // read current version 
+        //             pom = readMavenPom file: 'pom.xml'
+        //             currentVersion = pom.version
 
-                    // read previous version
-                    def filename = 'version.yaml'
-                    def data = readYaml file: filename
-                    previousVersion = data.version
+        //             // read previous version
+        //             def filename = 'version.yaml'
+        //             def data = readYaml file: filename
+        //             previousVersion = data.version
                     
-                    // read old tag
-                    def filetag = 'tag.yaml'
-                    def tagdata = readYaml file: filetag
-                    previousTag = tagdata.tag
+        //             // read old tag
+        //             def filetag = 'tag.yaml'
+        //             def tagdata = readYaml file: filetag
+        //             previousTag = tagdata.tag
 
-                    // compare current and previous version
-                    def currentTag = previousTag
-                    if (previousVersion == currentVersion) {
-                        final oldTagLastDigit = previousTag.substring(previousTag.length()-1) as int
-                        // echo "$oldTagLastDigit"
-                        final deleted = previousTag.substring(0, previousTag.length()-1)
-                        // echo "$deleted"
-                        currentTag = deleted + (++oldTagLastDigit)
-                        // echo "$currentTag"
-                    }
-                    else {
-                        final oldTagFirstDigit = previousTag.substring(0, 1) as int
-                        // echo "$oldTagFirstDigit"
-                        currentTag = "" + (++oldTagFirstDigit) + ".0.1"
-                        // echo "$currentTag"
-                    }
+        //             // compare current and previous version
+        //             def currentTag = previousTag
+        //             if (previousVersion == currentVersion) {
+        //                 final oldTagLastDigit = previousTag.substring(previousTag.length()-1) as int
+        //                 // echo "$oldTagLastDigit"
+        //                 final deleted = previousTag.substring(0, previousTag.length()-1)
+        //                 // echo "$deleted"
+        //                 currentTag = deleted + (++oldTagLastDigit)
+        //                 // echo "$currentTag"
+        //             }
+        //             else {
+        //                 final oldTagFirstDigit = previousTag.substring(0, 1) as int
+        //                 // echo "$oldTagFirstDigit"
+        //                 currentTag = "" + (++oldTagFirstDigit) + ".0.1"
+        //                 // echo "$currentTag"
+        //             }
                     
-                    // Change old version and tag
-                    data.version = currentVersion
-                    sh "rm $filename"
-                    writeYaml file: filename, data: data
+        //             // Change old version and tag
+        //             data.version = currentVersion
+        //             sh "rm $filename"
+        //             writeYaml file: filename, data: data
 
-                    tagdata.tag = currentTag
-                    sh "rm $filetag"
-                    writeYaml file: filetag, data: tagdata
+        //             tagdata.tag = currentTag
+        //             sh "rm $filetag"
+        //             writeYaml file: filetag, data: tagdata
 
-                    // set env variable to use in next script tag
-                    env.TAG = currentTag
-                }
-            }
-        }
+        //             // set env variable to use in next script tag
+        //             env.TAG = currentTag
+        //         }
+        //     }
+        // }
+        
 
-        stage('Build and Push Docker Image') {
-            steps {
-                script {
-                    // dockerImage = docker.build("meakkurt/gjg-restapi-demo")
-                    docker.withRegistry(
-                        'https://461902953491.dkr.ecr.eu-west-1.amazonaws.com',
-                        'ecr:eu-west-1:aws-ecr') {
-                            def image = docker.build('gjg-restapi-demo')
-                            image.push(env.TAG)
-                    }   
-                }
-            }
-        }
-        */
+        // stage('Build and Push Docker Image') {
+        //     steps {
+        //         script {
+        //             // dockerImage = docker.build("meakkurt/gjg-restapi-demo")
+        //             docker.withRegistry(
+        //                 'https://461902953491.dkr.ecr.eu-west-1.amazonaws.com',
+        //                 'ecr:eu-west-1:aws-ecr') {
+        //                     def image = docker.build('gjg-restapi-demo')
+        //                     image.push(env.TAG)
+        //             }   
+        //         }
+        //     }
+        // }
+        
         // stage('Push Docker Image') {
         //     steps {
         //         script {
