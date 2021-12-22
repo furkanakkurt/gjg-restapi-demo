@@ -28,11 +28,11 @@ pipeline {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     //  export AWS_PROFILE=default // this line is the first line of sh
                     sh '''
+                    mvn clean install
                     aws --version
-                    aws ec2 describe-instances
                     aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
-                    docker build -t sample-image .
-                    docker tag sample-image:1.0.0.0 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
+                    docker build -t gjg-restapi .
+                    docker tag gjg-restapi:1.0.0.0 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
                     docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
                     '''
                 }
