@@ -31,8 +31,8 @@ pipeline {
                     mvn clean install
                     aws --version
                     aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
-                    docker build -t gjg-restapi .
-                    docker tag gjg-restapi:1.0.0.0 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
+                    docker build -t gjg-restapi:latesst .
+                    docker tag gjg-restapi:latest 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
                     docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:1.0.0.0
                     '''
                 }
