@@ -16,11 +16,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "mvn --version"
-                sh "docker --version"
-                echo "Build"
-                echo "$PATH"
-                echo "Build number - $env.BUILD_NUMBER"
-                echo "Build tag - $env.BUILD_TAG"
+                sh "docker --version"            
             }
         }
         // stage('Build') {
@@ -34,7 +30,7 @@ pipeline {
                     sh '''
                     ##### INTERNAL DOCKER IMAGE BUILD & PUSH #############
                     echo "INTERNAL DOCKER IMAGE BUILD & PUSH"
-                    POM_LOCAL_VERSION=$(yq -r gjg_restapi_backend_dev_version.yaml .version )
+                    POM_LOCAL_VERSION=$(sudo yq -r gjg_restapi_backend_dev_version.yaml .version )
                     
                     echo $POM_LOCAL_VERSION
                     
