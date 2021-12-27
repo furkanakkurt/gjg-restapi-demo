@@ -30,13 +30,13 @@ pipeline {
                     sh '''
                     ##### INTERNAL DOCKER IMAGE BUILD & PUSH #############
                     echo "INTERNAL DOCKER IMAGE BUILD & PUSH"
-                    POM_LOCAL_VERSION=$(sudo yq -r gjg_restapi_backend_dev_version.yaml .version )
-                    
+                    POM_LOCAL_VERSION=$(yq -r .versions.pom gjg_restapi_backend_dev_version.yaml)
+                    RELEASE_VERSION=$(yq -r .versions.release  gjg_restapi_backend_dev_version.yaml)
                     echo $POM_LOCAL_VERSION
+                    echo $RELEASE_VERSION
+                    POM_VERSION=$(grep --max-count=1 '<version>' /home/jenkins-slave-01/workspace/gjg-restapi/pom.xml | awk -F '>' '{ print $2 }' | awk -F '<' '{ print $1 }')
                     
                     '''
-                    // RELEASE_VERSION=$(yq -r .xxx.digit  gjg_restapi_backend_dev_version.yaml)
-                    // echo $RELEASE_VERSION
                 }
             }
         }
