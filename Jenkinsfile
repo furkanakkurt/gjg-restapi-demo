@@ -36,6 +36,12 @@ pipeline {
                     echo $RELEASE_VERSION
                     POM_VERSION=$(grep -m2 '<version>' /home/jenkins-slave-01/workspace/gjg-restapi/pom.xml | tail -n1 | awk -F '>' '{ print $2 }' | awk -F '<' '{ print $1 }')                    
                     echo $POM_VERSION
+
+                    if [ "$POM_VERSION" = "$POM_LOCAL_VERSION" ]; then
+                        RELEASE_VERSION=$((RELEASE_VERSION + 1))
+                        echo $RELEASE_VERSION
+                        echo "pom versions are equal."
+                    fi
                     '''
                 }
             }
