@@ -31,18 +31,20 @@ pipeline {
                     ##### INTERNAL DOCKER IMAGE BUILD & PUSH #############
                     echo "INTERNAL DOCKER IMAGE BUILD & PUSH"
                     POM_LOCAL_VERSION=$(yq e '.version.pom' gjg_restapi_backend_dev_version.yaml)
-                    RELEASE_VERSION=$(yq e '.version.digit' gjg_restapi_backend_dev_version.yaml)
+                    RELEASE_VERSION=$(yq e '.version.release' gjg_restapi_backend_dev_version.yaml)
                     echo $POM_LOCAL_VERSION
                     echo $RELEASE_VERSION
                     POM_VERSION=$(grep -m2 '<version>' /home/jenkins-slave-01/workspace/gjg-restapi/pom.xml | tail -n1 | awk -F '>' '{ print $2 }' | awk -F '<' '{ print $1 }')                    
                     echo $POM_VERSION
 
                     if [ "$POM_VERSION" = "$POM_LOCAL_VERSION" ]; then
-                        echo $RELEASE_VERSION
-                        RELEASE_VERSION=$((RELEASE_VERSION + 1))
-                        echo $RELEASE_VERSION
+                        RELEASE_VERSION=$(./version.sh $RELEASE_VERSION bug)
                         echo "pom versions are equal."
+                    else
+                        RELEASE_VERSION=$(./version.sh $RELEASE_VERSION major)
+                        echo "pom versions  are not equal."
                     fi
+                    yq e -i '.version.release=env(RELEASE_VERSION)' a.yaml
                     '''
                 }
             }
