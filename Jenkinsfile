@@ -39,12 +39,13 @@ pipeline {
 
                     if [ "$POM_VERSION" = "$POM_LOCAL_VERSION" ]; then
                         RELEASE_VERSION=$(./version.sh $RELEASE_VERSION bug)
+                        yq e -i '.version.release=env(RELEASE_VERSION)' a.yaml
                         echo "pom versions are equal."
                     else
                         RELEASE_VERSION=$(./version.sh $RELEASE_VERSION major)
+                        yq e -i '.version.release=env(RELEASE_VERSION)' a.yaml
                         echo "pom versions  are not equal."
                     fi
-                    yq e -i '.version.release=env(RELEASE_VERSION)' a.yaml
                     '''
                 }
             }
