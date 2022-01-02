@@ -44,6 +44,7 @@ pipeline {
                         RELEASE_VERSION=$(./version.sh $RELEASE_VERSION major)
                         echo "pom versions  are not equal."
                     fi
+                    echo $RELEASE_VERSION
                     yq e -i '.version.release=env(RELEASE_VERSION)' gjg_restapi_backend_dev_version.yaml
                     '''
                 }
