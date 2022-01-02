@@ -48,20 +48,21 @@ pipeline {
                 }
             }
         }
-        // stage ('AWS Build and Push Image'){
-        //     steps {
-        //         withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //             //  export AWS_PROFILE=default // this line is the first line of sh
-        //             sh '''
-        //             aws --version
-        //             aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
-        //             docker build -t gjg-restapi:latest .
-        //             docker tag gjg-restapi:latest 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
-        //             docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:latest
-        //             '''
-        //         }
-        //     }
-        // }
+        stage ('AWS Build and Push Image'){
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    //  export AWS_PROFILE=default // this line is the first line of sh
+                    sh '''
+                    aws --version
+                    aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+                    IMAGE_TAG=$(yq e '.version.release' gjg_restapi_backend_dev_version.yaml)
+                    docker build -t gjg-restapi:${IMAGE_TAG} .
+                    docker tag gjg-restapi:${IMAGE_TAG} 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
+                    docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
+                    '''
+                }
+            }
+        }
         // stage('Update Version and Tag') {
         //     steps {
         //         script {
