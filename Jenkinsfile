@@ -5,17 +5,12 @@ pipeline {
        } 
     }
 
-    environment {
-        dockerHome = tool 'myDocker'
-        mavenHome = tool 'myMaven'
-        PATH = "$dockerHome/bin:$mavenHome/bin:$PATH"
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 sh "mvn --version"
-                sh "docker --version"  
+                sh "docker --version" 
+                sh "java -version"
             }
         }
         // stage('Build') {
