@@ -57,6 +57,29 @@ pipeline {
                 }
             }
         }
+        stage ('Deploy to ECS'){
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'furkan_terraform-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                    POM_VERSION=$(yq e '.version.pom' gjg_restapi_backend_dev_version.yaml)
+                    RELEASE_NUMBER=$(yq e '.version.release' gjg_restapi_backend_dev_version.yaml)
+                    
+                    echo "POM_VERSION: $POM_VERSION"
+                    echo "RELEASE_NUMBER: $RELEASE_NUMBER"
+
+                    REGION=eu-west-1
+                    REPOSITORY_NAME=ecr-devops-furkan
+                    CLUSTER=gjg-restapi-cluster-furkan
+                    FAMILY=gjg-restapi-furkan
+                    SERVICE_NAME=devops-furkan-ecs-service
+                    
+                    #Store the repositoryUri as a variable
+                    REPOSITORY_URI=`aws ecr describe-repositories --repository-names ${REPOSITORY_NAME} --region ${REGION} | jq .repositories[].repositoryUri | tr -d '"'`
+                    echo "REPOSITORY_URI: $REPOSITORY_URI"
+                    '''
+                }
+            }
+        }
     }
     // Good when you want to clean up and etc
     // post {
@@ -67,6 +90,23 @@ pipeline {
     //         mail to: 'furkan.akkurt@commencis.com',
     //         subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
     //         body: "Something is wrong with ${env.BUILD_URL}"
-    //     }
+
+    //                 #Replace the build number and respository URI placeholders with the constants above
+    //                 sed -e "s;%BUILD_NUMBER%;${POM_VERSION}.${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /yyyy/zzzz/jenkins/workspace/xxx_BACKEND_SERVER_DEV_PIPELINE/config/aws/xxx-backend-config/xxx-backend-dev/xxx-backend-dev-jsons/taskdef-dev.json > ${NAME}-v_${POM_VERSION}.${RELEASE_NUMBER}.json
+                    
+    //                 #Register the task definition in the repository
+    //                 /usr/local/bin/aws ecs register-task-definition --family ${FAMILY} --cli-input-json file://${WORKSPACE}/${NAME}-v_${POM_VERSION}.${RELEASE_NUMBER}.json --region ${REGION}
+    //                 SERVICES=`/usr/local/bin/aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .failures[]`
+    //                 #Get latest revision
+    //                 REVISION=`aws ecs describe-task-definition --task-definition ${FAMILY}--region ${REGION} | jq .taskDefinition.revision`
+                    
+    //                 #Create or update service
+    //                 DESIRED_COUNT=`/usr/local/bin/aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .services[].desiredCount`
+    //                 sed -e "s;%FIRST%;${FAMILY};g" -e "s;%SECOND%;${REVISION};g" /yyyy/zzzz/jenkins/workspace/xxx_BACKEND_SERVER_DEV_PIPELINE/config/aws/xxx-backend-config/xxx-backend-dev/xxx-backend-dev-ymls/appspec-dev.yaml > /yyyy/zzzz/xxx-backend-ymls/${NAME}-v_${POM_VERSION}.${RELEASE_NUMBER}.yaml
+    //                 /usr/local/bin/aws s3 cp /yyyy/zzzz/xxx-backend-ymls/${NAME}-v_${POM_VERSION}.${RELEASE_NUMBER}.yaml s3://xxx-backend-dev/appspec.yaml
+    //                 cd /yyyy/zzzz/jenkins/workspace/xxx_BACKEND_SERVER_DEV_PIPELINE/config/aws/xxx-backend-config/xxx-backend-dev/xxx-backend-dev-jsons/
+    //                 DEPLOYMENT_ID=$(/usr/local/bin/aws deploy create-deployment --cli-input-json file://create-deployment-dev.json --region eu-central-1 | jq -r '.deploymentId')
+    //                 aws deploy wait deployment-successful --region eu-central-1 --deployment-id $DEPLOYMENT_ID
+    // //     }
     // }
 }
