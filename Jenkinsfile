@@ -67,6 +67,7 @@ pipeline {
                     echo "POM_VERSION: $POM_VERSION"
                     echo "RELEASE_NUMBER: $RELEASE_NUMBER"
 
+                    NAME=gjg-restapi
                     REGION=eu-west-1
                     REPOSITORY_NAME=ecr-devops-furkan
                     CLUSTER=gjg-restapi-cluster-furkan
@@ -78,8 +79,23 @@ pipeline {
                     echo "REPOSITORY_URI: $REPOSITORY_URI"
 
                     #Replace the build number and respository URI placeholders with the constants above
-                    sed -e "s;%TAG%;${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/taskdef-dev.json > /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/gjg-restapi-v_${RELEASE_NUMBER}.json
+                    sed -e "s;%TAG%;${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/taskdef-dev.json > /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/releases/${NAME}-v_${RELEASE_NUMBER}.json
                     
+                    #Register the task definition in the repository
+                    aws ecs register-task-definition --family ${FAMILY} --cli-input-json file://home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/releases/gjg-restapi-v_${RELEASE_NUMBER}.json --region ${REGION}
+                    
+                    SERVICES=`aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .failures[]`
+                    #Get latest revision
+                    REVISION=`aws ecs describe-task-definition --task-definition ${FAMILY}--region ${REGION} | jq .taskDefinition.revision`
+                    
+                    #Create or update service
+                    DESIRED_COUNT=`aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .services[].desiredCount`
+                    sed -e "s;%FAMILY%;${FAMILY};g" -e "s;%REVISION%;${REVISION};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/yamls/appspec-dev.yaml > /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/yamls/releases/${NAME}-v_${RELEASE_NUMBER}.yaml
+                   
+                    aws s3 cp /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/yamls/releases/${NAME}-v_${RELEASE_NUMBER}.yaml s3://gjg-restapi-backend-dev/appspec.yaml
+                    cd /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/
+                    DEPLOYMENT_ID=$(aws deploy create-deployment --cli-input-json file://create-deployment-dev.json --region ${REGION} | jq -r '.deploymentId')
+                    aws deploy wait deployment-successful --region ${REGION} --deployment-id $DEPLOYMENT_ID
                     
                     '''
                 }
