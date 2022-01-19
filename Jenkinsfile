@@ -78,7 +78,7 @@ pipeline {
                     echo "REPOSITORY_URI: $REPOSITORY_URI"
 
                     #Replace the build number and respository URI placeholders with the constants above
-                    sed -e "s;%TAG%;${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/taskdef-dev.json > gjg-restapi-v_${RELEASE_NUMBER}.json
+                    sed -e "s;%TAG%;${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/taskdef-dev.json > /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/gjg-restapi-v_${RELEASE_NUMBER}.json
                     
                     
                     '''
