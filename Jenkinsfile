@@ -82,7 +82,7 @@ pipeline {
                     sed -e "s;%TAG%;${RELEASE_NUMBER};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/taskdef-dev.json > /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/releases/${NAME}-v_${RELEASE_NUMBER}.json
                     
                     #Register the task definition in the repository
-                    aws ecs register-task-definition --family ${FAMILY} --cli-input-json file://home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/releases/${NAME}-v_${RELEASE_NUMBER}.json --region ${REGION}
+                    aws ecs register-task-definition --family ${FAMILY} --cli-input-json file:///home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/releases/${NAME}-v_${RELEASE_NUMBER}.json --region ${REGION}
                     
                     SERVICES=`aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .failures[]`
                     #Get latest revision
