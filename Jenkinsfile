@@ -91,7 +91,7 @@ pipeline {
                     
                     SERVICES=`aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .failures[]`
                     #Get latest revision
-                    REVISION=`aws ecs describe-task-definition --task-definition ${FAMILY}--region ${REGION} | jq .taskDefinition.revision`
+                    REVISION=`aws ecs describe-task-definition --task-definition ${FAMILY} --region ${REGION} | jq .taskDefinition.revision`
                     
                     #Create or update service
                     DESIRED_COUNT=`aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ${REGION} | jq .services[].desiredCount`
