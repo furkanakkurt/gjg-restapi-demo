@@ -76,7 +76,7 @@ pipeline {
                     REGION=eu-west-1
                     REPOSITORY_NAME=ecr-devops-furkan
                     CLUSTER=gjg-restapi-cluster-furkan
-                    FAMILY=gjg-restapi-furkan
+                    FAMILY=gjg-restapi-task
                     SERVICE_NAME=devops-furkan-ecs-service
                     
                     #Store the repositoryUri as a variable
