@@ -99,7 +99,7 @@ pipeline {
                    
                     aws s3 cp /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/yamls/releases/${NAME}-v_${RELEASE_NUMBER}.yaml s3://gjg-restapi-backend-dev/appspec.yaml
                     cd /home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/
-                    DEPLOYMENT_ID=$(aws deploy create-deployment --cli-input-json file:///create-deployment-dev.json --region ${REGION} | jq -r '.deploymentId')
+                    DEPLOYMENT_ID=$(aws deploy create-deployment --cli-input-json file://home/jenkins-slave-01/workspace/GJG_RESTAPI_BACKEND_DEV/jsons/create-deployment-dev.json --region ${REGION} | jq -r '.deploymentId')
                     aws deploy wait deployment-successful --region ${REGION} --deployment-id $DEPLOYMENT_ID
                     
                     '''
