@@ -60,11 +60,11 @@ pipeline {
                     //  export AWS_PROFILE=default // this line is the first line of sh
                     sh '''
                     aws --version
-                    aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 461902953491.dkr.ecr.eu-west-1.amazonaws.com
+                    aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-1.amazonaws.com
                     IMAGE_TAG=$(yq e '.version.release' gjg_restapi_backend_dev_version.yaml)
                     docker build -t gjg-restapi:${IMAGE_TAG} .
-                    docker tag gjg-restapi:${IMAGE_TAG} 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
-                    docker push 461902953491.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
+                    docker tag gjg-restapi:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
+                    docker push ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-1.amazonaws.com/ecr-devops-furkan:${IMAGE_TAG}
                     '''
                 }
             }
